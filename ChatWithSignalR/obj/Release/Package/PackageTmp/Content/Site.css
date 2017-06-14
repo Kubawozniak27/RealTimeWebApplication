@@ -1,0 +1,130 @@
+﻿body
+{
+    padding: 0px;
+    margin: 0px;
+}
+
+#header
+{
+    padding: 20px;
+    background-color: #d7e5e4;
+    border-bottom: #5f9482 solid 2px;
+    color: #1e4638;
+    font-size: 24px;
+}
+
+.submitButton
+{
+    width:65px;
+    border:solid 2px;
+    border-radius:5px;
+}
+
+    .submitButton:hover
+    {
+        background-color: #e1e1e1;
+    }
+
+
+.chatRoom
+{
+
+
+    width: 650px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+    background-color: beige;
+    border-radius: 0.8em;
+    position: relative;
+    box-shadow: 1px 1px 12px rgba(0, 0, 0, 0.1);
+}
+
+    .chatRoom .title
+    {
+        font-size: 16px;
+        font-weight: bold;
+        color:whitesmoke;
+        padding: 8px;
+        background-color: cadetblue;
+        
+    }
+
+    .chatRoom .content
+    {
+        height: 300px;
+        clear: both;
+    }
+
+        .chatRoom .content .chatWindow
+        {
+            float: left;
+            width: 409px;
+            height: 300px;
+            border-right: solid 1px #5f9482;
+            overflow-y: scroll;
+        }
+
+            .chatRoom .content .chatWindow .message
+            {
+                padding: 4px;
+            }
+
+                .chatRoom .content .chatWindow .message .userName
+                {
+                    font-weight: bold;
+                }
+
+        .chatRoom .content .users
+        {
+            float: right;
+            width: 240px;
+            height: 300px;
+        }
+
+            .chatRoom .content .users .user
+            {
+                display: block;
+                cursor: pointer;
+                padding: 4px;
+                background-color: gray;
+                border-bottom: solid 1px #5f9482;
+            }
+
+            .chatRoom .content .users .loginUser
+            {
+                display: block;
+                padding: 4px;
+                color: black;
+                border-bottom: solid 1px #5f9482;
+            }
+
+            .chatRoom .content .users .user:hover
+            {
+                background-color: #e1e1e1;
+            }
+
+    .chatRoom .messageBar
+    {
+        border-top: solid 1px gray;
+        padding: 4px;
+    }
+
+        .chatRoom .messageBar .textbox
+        {
+            margin-left: 10px;
+            border:solid 2px;
+            border-radius:5px;
+            width: 330px;
+        }
+
+.disconnect
+{
+    position: absolute;
+    margin: 10px;
+    background-color: #ffcbcb;
+    padding: 4px;
+    border: solid 1px red;
+}
+
+

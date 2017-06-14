@@ -1,0 +1,242 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+
+
+
+<div class="jumbotron">
+    <strong id="paragraph"></strong>
+</div>
+
+
+
+<div id="divContainer">
+    <div class="row centered-form" id="divLogin">
+        <div class="col-xs-12 col-sm-8 col-md-4 col-sm-offset-2 col-md-offset-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h2 class="panel-title">Zaloguj się do chatu </h2>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <input type="email" name="email" id="nickName" class="form-control input-sm" placeholder="Podaj nick">
+                    </div>
+                    <input type="submit" value="Start chat" class="btn btn-info btn-block" id="buttonStartChat">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div id="divChat" class="chatRoom">
+        <div class="title">
+            <h3>Dołączyłeś do chatu jako  [<span id='spanUser'></span>] </h3>
+
+        </div>
+        <div class="content">
+            <div id="divChatWindow" class="chatWindow">
+            </div>
+            <div id="divusers" class="users">
+            </div>
+        </div>
+        <div class="messageBar">
+            <input class="textbox" type="text" id="txtMessage" />
+            <input id="btnSendMsg" type="button" value="Send" class="butt" />
+            <input id="btnClearChatBox" type="button" value="Clear" class="butt" />
+        </div>
+    </div>
+
+    <input id="hdId" type="hidden" />
+    <input id="hdUserName" type="hidden" />
+</div>
+
+
+
+
+@section scripts {
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <script type="text/javascript">
+
+
+        setScreen(false);
+
+        //Polaczenie z naszym ChatHub
+        var chatHub = $.connection.chatHub;
+
+        function setScreen(isLogin) {
+
+            if (!isLogin) {
+
+                $("#divChat").hide();
+                $("#divLogin").show();
+            }
+            else {
+
+                $("#divChat").show();
+                $("#divLogin").hide();
+            }
+
+        }
+
+
+
+        $.connection.hub.start().done(function () {
+
+
+            //Sprawdzanie, czy użytkownik wpisał nazwę
+            $("#buttonStartChat").click(function () {
+
+                var name = $("#nickName").val();
+                if (name.length > 0) {
+                    chatHub.server.connect(name);
+                }
+                else {
+                    alert("Podaj swój nick ");
+                }
+
+            });
+
+            $('#btnSendMsg').click(function () {
+
+                var msg = $("#txtMessage").val();
+                if (msg.length > 0) {
+
+                    var userName = $('#hdUserName').val();
+                    chatHub.server.sendMessageToAll(userName, msg);
+                    $("#txtMessage").val('');
+                }
+                else
+                {
+                    alert("Nie możesz wysłać pustej wiadomości")
+                }
+            });
+            //obsluga entera
+            $("#nickName").keypress(function (e) {
+                if (e.which == 13) {
+                    $("#buttonStartChat").click();
+                }
+            });
+   
+            $("#txtMessage").keypress(function (e) {
+                if (e.which == 13) {
+                    $('#btnSendMsg').click();
+                }
+            });
+
+
+            $("#btnClearChatBox").click(function () {
+                $('#divChatWindow').empty();
+
+            });
+        
+
+
+        });
+        
+
+        chatHub.client.onConnected = function (id, userName, allUsers, messages) {
+  
+            setScreen(true);
+
+            $("#divChat").show();
+            $("#divLogin").hide();
+
+            $('#hdId').val(id);
+            $('#hdUserName').val(userName);
+            $('#spanUser').html(userName);
+
+            
+            for (i = 0; i < allUsers.length; i++) {
+
+                AddUser(chatHub, allUsers[i].ConnectionId, allUsers[i].UserName);
+            }
+
+            for (i = 0; i < messages.length; i++) {
+
+                AddMessage(messages[i].UserName, messages[i].Message);
+            }
+
+
+        }
+
+        chatHub.client.onNewUserConnected = function (id, name) {
+
+            AddUser(chatHub, id, name);
+        }
+
+
+
+        chatHub.client.onUserDisconnected = function (id, userName) {
+
+            $('#' + id).remove();
+
+            var ctrId = 'private_' + id;
+            $('#' + ctrId).remove();
+
+
+        }
+
+        chatHub.client.messageReceived = function (userName, message) {
+
+            AddMessage(userName, message);
+        }
+
+        function AddUser(chatHub, id, name) {
+
+            var userId = $('#hdId').val();
+
+            var code = "";
+
+            if (userId == id) {
+
+                code = $('<div class="loginUser">' + name + "</div>");
+
+            }
+            else {
+
+                code = $('<div id="' + id + '" class="user" >' + name + '</div>');
+            }
+
+            $("#divusers").append(code);
+
+        }
+
+        function AddMessage(userName, message) {
+            $('#divChatWindow').append('<div class="message"><span class="userName">' + userName + '</span>: ' + message + '</div>');
+
+            var height = $('#divChatWindow')[0].scrollHeight;
+            $('#divChatWindow').scrollTop(height);
+        }
+
+
+    </script>
+
+
+
+
+    <script>
+
+        $(function () {
+            var counter = $.connection.counterOnlineUser;
+
+            $.connection.hub.start().done(function () {
+               
+                counter.server.send();
+            });
+
+            counter.client.recalculateOnlineUsers = function (message) {
+
+             
+                $('#paragraph').text(message);
+            };
+        });
+    </script>
+
+
+}
